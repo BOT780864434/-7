@@ -20,23 +20,6 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        /* تصميم السند المربع الاحترافي */
-        .receipt-container {
-            display: none;
-            max-width: 550px;
-            min-height: 550px; /* ليحافظ على الشكل المربع */
-            background: #ffffff;
-            margin: 20px auto;
-            padding: 40px;
-            border: 10px double #d4af37; /* إطار مذهب فخم */
-            border-radius: 4px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            position: relative;
-            box-sizing: border-box;
-            background-image: radial-gradient(circle, #faf8f2 10%, transparent 11%);
-            background-size: 20px 20px;
-        }
         h2 {
             text-align: center;
             color: #2c3e50;
@@ -54,7 +37,8 @@
         input[type="text"],
         input[type="number"],
         input[type="tel"],
-        input[type="date"] {
+        input[type="date"],
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ccc;
@@ -62,13 +46,14 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-        input:focus {
+        input:focus, select:focus {
             border-color: #27ae60;
             outline: none;
         }
         button {
             width: 100%;
             padding: 14px;
+            background-color: #25D366;
             color: white;
             border: none;
             border-radius: 4px;
@@ -76,87 +61,17 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
-            margin-bottom: 10px;
         }
-        .btn-submit { background-color: #27ae60; }
-        .btn-submit:hover { background-color: #219150; }
-        .btn-print { background-color: #d4af37; color: #111; }
-        .btn-print:hover { background-color: #aa8c2c; color: white; }
-        
-        /* عناصر السند وتنسيقه */
-        .receipt-header {
-            text-align: center;
-            border-bottom: 2px dashed #d4af37;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-        .receipt-header h3 {
-            margin: 0;
-            font-size: 26px;
-            color: #1a252f;
-            letter-spacing: 1px;
-        }
-        .receipt-header p {
-            margin: 5px 0 0 0;
-            font-size: 16px;
-            color: #7f8c8d;
-            font-weight: bold;
-        }
-        .receipt-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-        }
-        .receipt-table td {
-            padding: 12px 10px;
-            border-bottom: 1px solid #f1f1f1;
-            font-size: 15px;
-        }
-        .receipt-label {
-            font-weight: bold;
-            color: #7f8c8d;
-            width: 40%;
-        }
-        .receipt-value {
-            color: #2c3e50;
-            font-weight: bold;
-        }
-        .receipt-footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 14px;
-            color: #27ae60;
-            font-weight: bold;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-        .action-buttons {
-            max-width: 550px;
-            margin: 10px auto;
-            display: none;
-        }
-
-        /* إعدادات الطباعة للـ PDF والسند فقط */
-        @media print {
-            body { background: none; padding: 0; }
-            .form-container, .action-buttons { display: none !important; }
-            .receipt-container { 
-                display: block !important; 
-                box-shadow: none; 
-                margin: 0 auto; 
-                border: 10px double #d4af37 !important;
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact;
-            }
+        button:hover {
+            background-color: #128C7E;
         }
     </style>
 </head>
 <body>
 
-<!-- واجهة إدخال البيانات للطلاب -->
-<div class="form-container" id="formWindow">
+<div class="form-container">
     <h2>استمارة التسجيل في الأكاديمية</h2>
-    <form id="registrationForm" onsubmit="processRegistration(event)">
+    <form id="registrationForm" onsubmit="sendToWhatsApp(event)">
         
         <div class="form-group">
             <label for="fullName">الاسم الرباعي:</label>
@@ -165,7 +80,7 @@
 
         <div class="form-group">
             <label for="age">العمر:</label>
-            <input type="number" id="age" required placeholder="أدخل عمرك">
+            <input type="number" id="age" required placeholder="أدخل عمرك الحقيقي">
         </div>
 
         <div class="form-group">
@@ -193,67 +108,18 @@
             <input type="date" id="birthDate" required>
         </div>
 
-        <button type="submit" class="btn-submit">استمارة التسجيل</button>
+        <button type="submit">اضغط للتسجيل وإرسال البيانات</button>
     </form>
 </div>
 
-<!-- بطاقة / سند طلب التسجيل المربع والمصمم -->
-<div class="receipt-container" id="receiptWindow">
-    <div class="receipt-header">
-        <h3>الأكاديمية العلمية للتدريب</h3>
-        <p>سند إثبات تسجيل إلكتروني</p>
-        <span style="font-size: 12px; color: #95a5a6; display:block; margin-top:5px;">
-            رقم السند: #<span id="regNumber"></span> | تاريخ الطلب: <span id="regDate"></span>
-        </span>
-    </div>
-
-    <table class="receipt-table">
-        <tr>
-            <td class="receipt-label">الاسم الرباعي:</td>
-            <td class="receipt-value" id="rName"></td>
-        </tr>
-        <tr>
-            <td class="receipt-label">العمر:</td>
-            <td class="receipt-value" id="rAge"></td>
-        </tr>
-        <tr>
-            <td class="receipt-label">المحافظة (الأصل):</td>
-            <td class="receipt-value" id="rOrigin"></td>
-        </tr>
-        <tr>
-            <td class="receipt-label">المديرية:</td>
-            <td class="receipt-value" id="rDistrict"></td>
-        </tr>
-        <tr>
-            <td class="receipt-label">رقم الهاتف:</td>
-            <td class="receipt-value" id="rPhone"></td>
-        </tr>
-        <tr>
-            <td class="receipt-label">مكان الميلاد:</td>
-            <td class="receipt-value" id="rBPlace"></td>
-        </tr>
-        <tr>
-            <td class="receipt-label">تاريخ الميلاد:</td>
-            <td class="receipt-value" id="rBDate"></td>
-        </tr>
-    </table>
-    
-    <div class="receipt-footer">
-        ✓ تم اعتماد طلب التسجيل بنجاح في أنظمة الأكاديمية
-    </div>
-</div>
-
-<!-- أزرار التحكم الخارجي بالسند للحفاظ على شكله المربع عند التصوير -->
-<div class="action-buttons" id="actionButtons">
-    <button onclick="window.print()" class="btn-print">🖨️ طباعة السند أو حفظه كـ PDF</button>
-    <button onclick="location.reload()" style="background-color: #7f8c8d;">تسجيل طالب جديد</button>
-</div>
-
 <script>
-function processRegistration(event) {
-    event.preventDefault();
+function sendToWhatsApp(event) {
+    event.preventDefault(); // منع الصفحة من إعادة التحميل
 
-    // جلب قيم الاستمارة
+    // رقم هاتف مشرف الأكاديمية المعتمد بدون إضافات
+    const adminPhoneNumber = "967718722595"; 
+
+    // جلب البيانات من الخانات
     const fullName = document.getElementById('fullName').value;
     const age = document.getElementById('age').value;
     const originGovernorate = document.getElementById('originGovernorate').value;
@@ -262,21 +128,7 @@ function processRegistration(event) {
     const birthPlace = document.getElementById('birthPlace').value;
     const birthDate = document.getElementById('birthDate').value;
 
-    // تعبئة خلايا جدول السند
-    document.getElementById('rName').innerText = fullName;
-    document.getElementById('rAge').innerText = age + " سنة";
-    document.getElementById('rOrigin').innerText = originGovernorate;
-    document.getElementById('rDistrict').innerText = district;
-    document.getElementById('rPhone').innerText = phone;
-    document.getElementById('rBPlace').innerText = birthPlace;
-    document.getElementById('rBDate').innerText = birthDate;
-
-    // توليد بيانات توثيق السند
-    document.getElementById('regNumber').innerText = Math.floor(100000 + Math.random() * 900000);
-    document.getElementById('regDate').innerText = new Date().toLocaleDateString('ar-EG');
-
-    // إرسال البيانات الفوري إلى واتساب المشرف
-    const adminPhoneNumber = "967718722595";
+    // تنسيق نص الرسالة المرتبة للمشرف
     const message = `*طلب تسجيل جديد في الأكاديمية* \n\n` +
                     `📝 *الاسم الرباعي:* ${fullName}\n` +
                     `🔢 *العمر:* ${age}\n` +
@@ -286,4 +138,16 @@ function processRegistration(event) {
                     `🏛️ *مكان الميلاد:* ${birthPlace}\n` +
                     `📅 *تاريخ الميلاد:* ${birthDate}`;
 
+    // ترميز الرسالة لتناسب الروابط
     const encodedMessage = encodeURIComponent(message);
+
+    // إنشاء رابط الواتساب المصلح والمباشر
+    const whatsAppUrl = `https://wa.me{adminPhoneNumber}?text=${encodedMessage}`;
+
+    // فتح الرابط وتوجيه الطالب للواتساب مباشرة
+    window.open(whatsAppUrl, '_blank');
+}
+</script>
+
+</body>
+</html>
